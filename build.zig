@@ -33,4 +33,5 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
     const all_tests = b.step("test", "Run all tests");
     register_day(b, &target, &optimize, all_tests, "one");
+    register_day(b, &target, &optimize, all_tests, "two");
 }
