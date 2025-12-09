@@ -1,6 +1,6 @@
 const std = @import("std");
 
-fn register_day(b: *std.Build, target: *const std.Build.ResolvedTarget, optimize: *const std.builtin.OptimizeMode, all_tests: *const *std.Build.Step, comptime name: []const u8) void {
+fn register_day(b: *std.Build, target: *const std.Build.ResolvedTarget, optimize: *const std.builtin.OptimizeMode, all_tests: *std.Build.Step, comptime name: []const u8) void {
     const path = "src/" ++ name ++ ".zig";
     const artifact = b.addExecutable(.{
         .name = name,
@@ -67,5 +67,5 @@ pub fn build(b: *std.Build) void {
     // If neither case applies to you, feel free to delete the declaration you
     // don't need and to put everything under a single module.
     const test_step = b.step("test", "Run all tests");
-    register_day(b, &target, &optimize, &test_step, "one");
+    register_day(b, &target, &optimize, test_step, "one");
 }
