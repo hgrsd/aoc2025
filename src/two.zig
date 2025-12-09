@@ -10,7 +10,7 @@ fn parseRange(from: []const u8) !struct { usize, usize } {
 
 fn isValid(number: usize) !bool {
     var buf: [32]u8 = undefined;
-    const stringified = try std.fmt.bufPrint(&buf, "{d}", .{number});
+    const stringified = try std.fmt.bufPrint(&buf, "{}", .{number});
 
     if (@mod(stringified.len, 2) != 0) return true;
     const midpoint = stringified.len / 2;
@@ -19,7 +19,7 @@ fn isValid(number: usize) !bool {
 
 fn isValidTheSecond(number: usize) !bool {
     var buf: [32]u8 = undefined;
-    const stringified = try std.fmt.bufPrint(&buf, "{d}", .{number});
+    const stringified = try std.fmt.bufPrint(&buf, "{}", .{number});
     for (2..stringified.len + 1) |nChunks| {
         if (stringified.len % nChunks != 0) continue;
         const chunkSize = stringified.len / nChunks;

@@ -48,8 +48,8 @@ fn partTwo() !u32 {
 }
 
 pub fn main() !void {
-    std.debug.print("part 1: {d}\n", .{try partOne()});
-    std.debug.print("part 2: {d}\n", .{try partTwo()});
+    std.debug.print("part 1: {}\n", .{try partOne()});
+    std.debug.print("part 2: {}\n", .{try partTwo()});
 }
 
 test "50 L68 = 82" {
