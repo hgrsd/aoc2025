@@ -26,9 +26,12 @@ fn isValidTheSecond(number: usize) !bool {
         const firstChunk = stringified[0..chunkSize];
         var allMatch = true;
         for (1..nChunks) |chunk| {
-            if (!std.mem.eql(u8, firstChunk, stringified[chunk * chunkSize .. chunk * chunkSize + chunkSize])) allMatch = false;
+            if (!std.mem.eql(u8, firstChunk, stringified[chunk * chunkSize .. chunk * chunkSize + chunkSize])) {
+                allMatch = false;
+                break;
+            }
         }
-        if (allMatch == true) return false;
+        if (allMatch) return false;
     }
     return true;
 }
@@ -43,28 +46,18 @@ fn sumInvalidNumbers(start: usize, end: usize, isValidFn: anytype) !usize {
     return acc;
 }
 
-fn partOne() !usize {
+fn solve(isValidFn: anytype) !usize {
     var iter = std.mem.tokenizeScalar(u8, data, ',');
     var acc: usize = 0;
     while (iter.next()) |range| {
         const start, const end = try parseRange(range);
-        acc += try sumInvalidNumbers(start, end, isValid);
+        acc += try sumInvalidNumbers(start, end, isValidFn);
     }
 
     return acc;
 }
 
-fn partTwo() !usize {
-    var iter = std.mem.tokenizeScalar(u8, data, ',');
-    var acc: usize = 0;
-    while (iter.next()) |range| {
-        const start, const end = try parseRange(range);
-        acc += try sumInvalidNumbers(start, end, isValidTheSecond);
-    }
-
-    return acc;
-}
 pub fn main() !void {
-    std.debug.print("part 1: {}\n", .{try partOne()});
-    std.debug.print("part 2: {}\n", .{try partTwo()});
+    std.debug.print("part 1: {}\n", .{try solve(isValid)});
+    std.debug.print("part 2: {}\n", .{try solve(isValidTheSecond)});
 }
