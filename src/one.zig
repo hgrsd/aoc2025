@@ -22,9 +22,9 @@ fn newPosv2(cur: i32, move: i32) struct { i32, u32 } {
     return .{ position, zeroes };
 }
 
-fn partOne() !i32 {
+fn partOne() !u32 {
     var pos: i32 = 50;
-    var zeroes: i32 = 0;
+    var zeroes: u32 = 0;
     var iterator = std.mem.tokenizeScalar(u8, data, '\n');
     while (iterator.next()) |line| {
         const move = try parseMove(line);
