@@ -6,7 +6,7 @@ const BUF_SIZE = 100;
 fn highestPossibleNumber(nDigits: usize, buf: []u8, bank: []const u8) !usize {
     // fill our buffer with the joltages, with zeroes for unused indices
     for (0..bank.len) |i| {
-        const num = try std.fmt.parseInt(u8, bank[i .. i + 1], 10);
+        const num = try std.fmt.charToDigit(bank[i], 10);
         buf[i] = num;
     }
 

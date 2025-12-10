@@ -3,8 +3,8 @@ const data = std.mem.trim(u8, @embedFile("inputs/2"), "\r\t\n");
 
 fn parseRange(from: []const u8) !struct { usize, usize } {
     var iter = std.mem.splitScalar(u8, from, '-');
-    const start = iter.next() orelse unreachable;
-    const end = iter.next() orelse unreachable;
+    const start = iter.next().?;
+    const end = iter.next().?;
     return .{ try std.fmt.parseInt(usize, start, 10), try std.fmt.parseInt(usize, end, 10) };
 }
 
@@ -23,10 +23,11 @@ fn isValidTheSecond(number: usize) !bool {
     for (2..stringified.len + 1) |nChunks| {
         if (stringified.len % nChunks != 0) continue;
         const chunkSize = stringified.len / nChunks;
-        const firstChunk = stringified[0..chunkSize];
+        var windows = std.mem.window(u8, stringified, chunkSize, chunkSize);
+        const firstChunk = windows.next().?;
         var allMatch = true;
-        for (1..nChunks) |chunk| {
-            if (!std.mem.eql(u8, firstChunk, stringified[chunk * chunkSize .. chunk * chunkSize + chunkSize])) {
+        while (windows.next()) |chunk| {
+            if (!std.mem.eql(u8, firstChunk, chunk)) {
                 allMatch = false;
                 break;
             }
