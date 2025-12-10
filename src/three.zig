@@ -3,8 +3,9 @@ const data = std.mem.trim(u8, @embedFile("inputs/3"), "\r\t\n");
 
 const BUF_SIZE = 100;
 
-fn highestPossibleNumber(nDigits: usize, buf: []u8, bank: []const u8) !usize {
-    // fill our buffer with the joltages, with zeroes for unused indices
+fn highestPossibleNumber(nDigits: usize, bank: []const u8) !usize {
+    var buf: [BUF_SIZE]u8 = undefined;
+
     for (0..bank.len) |i| {
         const num = try std.fmt.charToDigit(bank[i], 10);
         buf[i] = num;
@@ -31,11 +32,9 @@ fn highestPossibleNumber(nDigits: usize, buf: []u8, bank: []const u8) !usize {
 
 fn solve(nDigits: usize) !usize {
     var accumulator: usize = 0;
-    var buf: [BUF_SIZE]u8 = .{0} ** BUF_SIZE;
-
     var iter = std.mem.tokenizeScalar(u8, data, '\n');
     while (iter.next()) |bank| {
-        accumulator += try highestPossibleNumber(nDigits, &buf, bank);
+        accumulator += try highestPossibleNumber(nDigits, bank);
     }
     return accumulator;
 }
@@ -45,11 +44,9 @@ pub fn main() !void {
 }
 
 test "highest possible in 987654321111111 with n=2 == 98" {
-    var buf: [BUF_SIZE]u8 = .{0} ** BUF_SIZE;
-    try std.testing.expectEqual(98, try highestPossibleNumber(2, &buf, "987654321111111"));
+    try std.testing.expectEqual(98, try highestPossibleNumber(2, "987654321111111"));
 }
 
 test "highest possible in 818181911112111 with n=12 == 888911112111" {
-    var buf: [BUF_SIZE]u8 = .{0} ** BUF_SIZE;
-    try std.testing.expectEqual(888911112111, try highestPossibleNumber(12, &buf, "818181911112111"));
+    try std.testing.expectEqual(888911112111, try highestPossibleNumber(12, "818181911112111"));
 }
