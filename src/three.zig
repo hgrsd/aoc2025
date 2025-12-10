@@ -31,16 +31,12 @@ fn highestPossibleNumber(nDigits: usize, buf: []u8, bank: []const u8) !usize {
 
 fn solve(nDigits: usize) !usize {
     var accumulator: usize = 0;
-    var buf: [BUF_SIZE]u8 = undefined;
+    var buf: [BUF_SIZE]u8 = .{0} ** BUF_SIZE;
 
     var iter = std.mem.tokenizeScalar(u8, data, '\n');
     while (iter.next()) |bank| {
-        // clear the buffer before we pass it
-        buf = .{0} ** BUF_SIZE;
-        const number = try highestPossibleNumber(nDigits, &buf, bank);
-        accumulator += number;
+        accumulator += try highestPossibleNumber(nDigits, &buf, bank);
     }
-
     return accumulator;
 }
 pub fn main() !void {
