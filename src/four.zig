@@ -82,6 +82,12 @@ const Grid = struct {
         return r.items[@as(usize, @intCast(col))];
     }
 
+    fn removePaperAt(self: *Grid, r: usize, c: usize) void {
+        const row = &self.data.items[r];
+        const new = [_]Coordinate{.{ .row = r, .col = c, .value = .empty }};
+        row.replaceRangeAssumeCapacity(c, 1, &new);
+    }
+
     fn iter(self: *const Grid) Gridterator {
         return Gridterator.init(self);
     }
@@ -140,8 +146,44 @@ fn part1(allocator: std.mem.Allocator) !u32 {
     return accessible;
 }
 
+fn part2(allocator: std.mem.Allocator) !u32 {
+    var grid = try Grid.init(allocator, data);
+    defer grid.deinit();
+
+    var removed: u32 = 0;
+    while (true) {
+        var removable: usize = 0;
+        var bufRemovable: [4096]Coordinate = undefined;
+        var iter = grid.iter();
+        while (iter.next()) |coordinate| {
+            if (coordinate.value != .paper) continue;
+            var rolls: u32 = 0;
+            var neighbours = coordinate.neighbours(&grid);
+            while (neighbours.next()) |neighbour| {
+                if (neighbour.value == .paper) {
+                    rolls += 1;
+                }
+            }
+            if (rolls < 4) {
+                bufRemovable[removable] = coordinate;
+                removable += 1;
+            }
+        }
+        if (removable == 0) {
+            break;
+        }
+        for (0..removable) |i| {
+            const coord = bufRemovable[i];
+            grid.removePaperAt(coord.row, coord.col);
+            removed += 1;
+        }
+    }
+    return removed;
+}
+
 pub fn main() !void {
     var da = std.heap.DebugAllocator(.{}).init;
     const allocator = da.allocator();
     std.debug.print("day 4, part 1: {}\n", .{try part1(allocator)});
+    std.debug.print("day 4, part 2: {}\n", .{try part2(allocator)});
 }
