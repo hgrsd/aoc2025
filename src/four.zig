@@ -76,6 +76,7 @@ const Grid = struct {
     }
 
     fn valueAt(self: *const Grid, row: usize, col: usize) ?Coordinate {
+        if (row >= self.data.items.len) return null;
         const r = self.data.items[row];
         if (col >= r.items.len) return null;
         return r.items[col];
@@ -151,8 +152,8 @@ fn part2(allocator: std.mem.Allocator) !u32 {
 
     var removed: u32 = 0;
     while (true) {
-        var removable: usize = 0;
-        var bufRemovable: [4096]Coordinate = undefined;
+        var buf: [4096]Coordinate = undefined;
+        var removable = std.ArrayListUnmanaged(Coordinate).initBuffer(&buf);
         var iter = grid.iter();
         while (iter.next()) |coordinate| {
             if (coordinate.value != .paper) continue;
@@ -164,15 +165,13 @@ fn part2(allocator: std.mem.Allocator) !u32 {
                 }
             }
             if (rolls < 4) {
-                bufRemovable[removable] = coordinate;
-                removable += 1;
+                removable.appendAssumeCapacity(coordinate);
             }
         }
-        if (removable == 0) {
+        if (removable.items.len == 0) {
             break;
         }
-        for (0..removable) |i| {
-            const coord = bufRemovable[i];
+        for (removable.items) |coord| {
             grid.removePaperAt(coord.row, coord.col);
             removed += 1;
         }
