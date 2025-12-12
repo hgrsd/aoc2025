@@ -171,7 +171,7 @@ fn part2(allocator: std.mem.Allocator) !u32 {
         if (removable.items.len == 0) {
             break;
         }
-        for (removable.items) |coord| {
+        for (removable) |coord| {
             grid.removePaperAt(coord.row, coord.col);
             removed += 1;
         }
