@@ -76,10 +76,9 @@ const Grid = struct {
     }
 
     fn valueAt(self: *const Grid, row: usize, col: usize) ?Coordinate {
-        if (row < 0 or col < 0 or row >= self.data.items.len) return null;
-        const r = self.data.items[@as(usize, @intCast(row))];
+        const r = self.data.items[row];
         if (col >= r.items.len) return null;
-        return r.items[@as(usize, @intCast(col))];
+        return r.items[col];
     }
 
     fn removePaperAt(self: *Grid, r: usize, c: usize) void {
