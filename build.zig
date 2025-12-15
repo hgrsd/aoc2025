@@ -37,4 +37,5 @@ pub fn build(b: *std.Build) void {
     registerDay(b, &target, &optimize, allTests, "three");
     registerDay(b, &target, &optimize, allTests, "four");
     registerDay(b, &target, &optimize, allTests, "five");
+    registerDay(b, &target, &optimize, allTests, "six");
 }
