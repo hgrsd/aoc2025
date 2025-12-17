@@ -49,9 +49,66 @@ fn partOne(a: std.mem.Allocator) !u64 {
     return accumulator;
 }
 
+fn partTwo(a: std.mem.Allocator) !u64 {
+    var rows = std.ArrayList([]const u8).empty;
+    defer rows.deinit(a);
+
+    var rowIter = std.mem.tokenizeScalar(u8, data, '\n');
+    while (rowIter.next()) |row| {
+        try rows.append(a, row);
+    }
+
+    var accumulator: usize = 0;
+    var i: i64 = @as(i64, @intCast(rows.items[0].len - 1));
+    var collectedNumbers = std.ArrayList(usize).empty;
+    defer collectedNumbers.deinit(a);
+    while (i >= 0) : (i -= 1) {
+        const idx: usize = @as(usize, @intCast(i));
+        var num: usize = 0;
+        for (rows.items[0 .. rows.items.len - 1]) |row| {
+            if (row[idx] != ' ') {
+                if (num != 0) {
+                    num *= 10;
+                }
+                num += try std.fmt.charToDigit(row[idx], 10);
+            }
+        }
+        try collectedNumbers.append(a, num);
+        const maybeOp = rows.items[rows.items.len - 1][idx];
+        switch (maybeOp) {
+            '+' => {
+                var partialResult: usize = 0;
+                for (collectedNumbers.items) |n| {
+                    partialResult += n;
+                }
+                accumulator += partialResult;
+                if (i > 0) {
+                    i -= 1;
+                }
+                collectedNumbers.clearRetainingCapacity();
+            },
+            '*' => {
+                var partialResult: usize = 1;
+                for (collectedNumbers.items) |n| {
+                    partialResult *= n;
+                }
+                accumulator += partialResult;
+                if (i > 0) {
+                    i -= 1;
+                }
+                collectedNumbers.clearRetainingCapacity();
+            },
+            else => {},
+        }
+    }
+
+    return accumulator;
+}
+
 pub fn main() !void {
     var da = std.heap.DebugAllocator(.{}).init;
     defer _ = da.deinit();
     const allocator = da.allocator();
     std.debug.print("day 6, part 1: {}\n", .{try partOne(allocator)});
+    std.debug.print("day 6, part 2: {}\n", .{try partTwo(allocator)});
 }
