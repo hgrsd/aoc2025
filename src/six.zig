@@ -3,6 +3,21 @@ const data = @embedFile("inputs/6");
 
 const Op = union(enum) { add, mult, lit: usize };
 
+fn reduce(In: type, Out: type, f: *const fn (Out, In) Out, values: []const In, default: Out) Out {
+    var acc: Out = default;
+    for (values) |value| {
+        acc = f(acc, value);
+    }
+    return acc;
+}
+
+fn sum(a: usize, b: usize) usize {
+    return a + b;
+}
+fn mult(a: usize, b: usize) usize {
+    return a * b;
+}
+
 fn partOne(a: std.mem.Allocator) !u64 {
     var rows = std.ArrayList(std.ArrayList(Op)).empty;
     defer rows.deinit(a);
@@ -77,10 +92,7 @@ fn partTwo(a: std.mem.Allocator) !u64 {
         const maybeOp = rows.items[rows.items.len - 1][idx];
         switch (maybeOp) {
             '+' => {
-                var partialResult: usize = 0;
-                for (collectedNumbers.items) |n| {
-                    partialResult += n;
-                }
+                const partialResult = reduce(usize, usize, sum, collectedNumbers.items, 0);
                 accumulator += partialResult;
                 if (i > 0) {
                     i -= 1;
@@ -88,10 +100,7 @@ fn partTwo(a: std.mem.Allocator) !u64 {
                 collectedNumbers.clearRetainingCapacity();
             },
             '*' => {
-                var partialResult: usize = 1;
-                for (collectedNumbers.items) |n| {
-                    partialResult *= n;
-                }
+                const partialResult = reduce(usize, usize, mult, collectedNumbers.items, 1);
                 accumulator += partialResult;
                 if (i > 0) {
                     i -= 1;
