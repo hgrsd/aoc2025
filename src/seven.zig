@@ -42,33 +42,9 @@ const Grid = struct {
     rows: usize,
     cols: usize,
 
-    fn init(a: std.mem.Allocator, data: []const u8) !Grid {
+    fn parse(a: std.mem.Allocator, data: []const u8) !Grid {
         const parsedGrid = try allocParseGrid(a, data);
         return .{ .a = a, .data = parsedGrid, .cols = parsedGrid[0].len, .rows = parsedGrid.len };
-    }
-
-    fn evolve(self: *Grid, row: usize) void {
-        const previousRow = self.data[row - 1];
-        var currentRow = self.data[row];
-        for (previousRow, 0..) |previousValue, i| {
-            const currentValue = currentRow[i];
-            // we only have to do work if the value above is a tachyon; otherwise, we just keep whatever the current value is intact
-            if (previousValue != .tachyon) continue;
-
-            // tachyons continue downward unless they meet a splitter
-            if (currentValue != .splitter) {
-                currentRow[i] = .tachyon;
-            } else {
-                // keep splitter in place, split tachyon to the left and right of it. this can safely overwrite already-set tachyon fields,
-                // but we do need boundary checks to make sure we stay within the column width.
-                if (i > 0) {
-                    currentRow[i - 1] = .tachyon;
-                }
-                if (i < currentRow.len - 1) {
-                    currentRow[i + 1] = .tachyon;
-                }
-            }
-        }
     }
 
     fn deinit(self: *Grid) void {
@@ -80,10 +56,30 @@ const Grid = struct {
 };
 
 fn partOne(a: std.mem.Allocator) !usize {
-    var grid = try Grid.init(a, input);
+    var grid = try Grid.parse(a, input);
     defer grid.deinit();
     for (1..grid.rows) |i| {
-        grid.evolve(i);
+        const previousRow = grid.data[i - 1];
+        var currentRow = grid.data[i];
+        for (previousRow, 0..) |previousValue, j| {
+            const currentValue = currentRow[j];
+            // we only have to do work if the value above is a tachyon; otherwise, we just keep whatever the current value is intact
+            if (previousValue != .tachyon) continue;
+
+            // tachyons continue downward unless they meet a splitter
+            if (currentValue != .splitter) {
+                currentRow[j] = .tachyon;
+            } else {
+                // keep splitter in place, split tachyon to the left and right of it. this can safely overwrite already-set tachyon fields,
+                // but we do need boundary checks to make sure we stay within the column width.
+                if (j > 0) {
+                    currentRow[j - 1] = .tachyon;
+                }
+                if (j < currentRow.len - 1) {
+                    currentRow[j + 1] = .tachyon;
+                }
+            }
+        }
     }
 
     var splits: usize = 0;
